@@ -78,6 +78,9 @@ model Recommendation {
   // Foreign Keys
   gig    Gig    @relation(fields: [gigId], references: [id])
   talent Talent @relation(fields: [talentId], references: [id])
+
+  // gigId_talentId compound index for uniqueness
+  @@unique([gigId, talentId])
 }
 
 enum EmbeddingType {

@@ -6,3 +6,90 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+model Customer {
+  id          String       @id
+  email       String       @unique
+  name        String
+  type        CustomerType
+  companyName String?
+  website     String?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime
+  Gig         Gig[]
+}
+
+model Embedding {
+  id       String                @id
+  type     EmbeddingType
+  entityId String
+  vector   Unsupported("vector")
+
+  @@index([type, entityId])
+}
+
+model Gig {
+  id               String           @id
+  title            String
+  description      String
+  location         String?
+  budgetMin        Int?
+  budgetMax        Int?
+  stylePreferences String[]
+  category         String
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime
+  customerId       String
+  skills           String[]
+  status           GigStatus
+  Customer         Customer         @relation(fields: [customerId], references: [id])
+  Recommendation   Recommendation[]
+}
+
+model Recommendation {
+  id        String   @id
+  gigId     String
+  talentId  String
+  createdAt DateTime @default(now())
+  details   String?
+  ranking   Int
+  Gig       Gig      @relation(fields: [gigId], references: [id])
+  Talent    Talent   @relation(fields: [talentId], references: [id])
+
+  @@unique([gigId, talentId])
+}
+
+model Talent {
+  id              String           @id
+  name            String
+  city            String
+  categories      String[]
+  skills          String[]
+  experienceYears Int
+  budgetMin       Int
+  budgetMax       Int
+  portfolioLinks  String[]
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime
+  Recommendation  Recommendation[]
+}
+
+enum CustomerType {
+  CREATOR
+  STARTUP
+  INDIVIDUAL
+}
+
+enum EmbeddingType {
+  GIG
+  TALENT
+}
+
+enum GigStatus {
+  ACTIVE
+  CREATED
+  TALENT_RECOMMENDED
+  TALENT_SELECTED
+  COMPLETED
+  PENDING
+}

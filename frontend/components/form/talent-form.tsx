@@ -131,6 +131,9 @@ export function TalentForm({
         createTalentThunk({
           data: {
             ...data,
+            categories: categories,
+            skills: skills,
+            portfolioLinks: portfolioLinks,
           },
         })
       );

@@ -124,6 +124,8 @@ export function GigForm({
         createGigThunk({
           data: {
             ...data,
+            skills: skills,
+            stylePreferences: stylePreferences,
           },
         })
       );
