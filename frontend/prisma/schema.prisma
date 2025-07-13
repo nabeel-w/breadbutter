@@ -1,0 +1,87 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Customer {
+  id          String       @id @default(uuid())
+  email       String       @unique
+  name        String
+  type        CustomerType // 'creator', 'startup', or 'individual'
+  companyName String? // Optional for startups
+  website     String? // Optional
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  // Relationships
+  gigs Gig[]
+}
+
+model Gig {
+  id               String    @id @default(uuid())
+  title            String
+  description      String
+  location         String?
+  budgetMin        Int?
+  budgetMax        Int?
+  stylePreferences String[] // e.g. ['Minimalist', 'Bold', 'Professional']
+  category         String // e.g. 'Branding', 'UI/UX', 'Development'
+  skills           String[] // e.g. ['Figma', 'React', 'SEO']
+  status           GigStatus
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  // Foreign Keys
+  customerId         String
+  customer           Customer @relation(fields: [customerId], references: [id])
+  RecommendedTalents Talent[] @relation("GigRecommendedTalents")
+}
+
+model Talent {
+  id              String   @id @default(uuid())
+  name            String
+  city            String
+  categories      String[] // e.g. ['Design', 'Development', 'Marketing']
+  skills          String[] // e.g. ['Figma', 'React', 'SEO']
+  experienceYears Int
+  budgetMin       Int
+  budgetMax       Int
+  portfolioLinks  String[] // array of URLs
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  Gig             Gig[] @relation("GigRecommendedTalents")
+}
+
+model Embedding {
+  id       String                @id @default(uuid())
+  type     EmbeddingType
+  entityId String
+  vector   Unsupported("vector")
+
+  @@index([type, entityId])
+}
+
+enum EmbeddingType {
+  GIG
+  TALENT
+}
+
+enum CustomerType {
+  CREATOR
+  STARTUP
+  INDIVIDUAL
+}
+
+enum GigStatus {
+  ACTIVE
+  CREATED
+  TALENT_RECOMMENDED
+  TALENT_SELECTED
+  COMPLETED
+  PENDING
+}
