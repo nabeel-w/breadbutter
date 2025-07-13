@@ -7,6 +7,8 @@ import { Plus, Calendar, DollarSign, Clock } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { GigForm } from "@/components/form/gig-form";
 
 // Sample data for user's gigs
 const userGigs = [
@@ -58,6 +60,7 @@ const getStatusColor = (status: string) => {
 
 export default function YourGigs() {
   const [searchQuery, setSearchQuery] = useState("");
+  const [isOpen, setIsOpen] = useState(false);
   const isTyping = searchQuery.trim().length > 0;
 
   return (
@@ -72,7 +75,7 @@ export default function YourGigs() {
             Manage your active projects and find top talent for your needs.
           </p>
         </div>
-        <Button className="bg-purple-600 hover:bg-purple-700 text-white">
+        <Button className="bg-purple-600 hover:bg-purple-700 text-white" onClick={() => setIsOpen(true)}>
           <Plus className="mr-2 h-4 w-4" />
           Create Gig
         </Button>
@@ -198,6 +201,18 @@ export default function YourGigs() {
           </Card>
         ))}
       </div>
+
+      <Dialog open={isOpen} onOpenChange={setIsOpen}>
+        <DialogContent className="max-w-2xl max-h-[75vh] overflow-y-auto bg-gradient-to-br from-black via-purple-950 to-black p-8">
+          <GigForm
+            onSubmit={() => setIsOpen(false)}
+            isLoading={false}
+            initialData={{
+              status: "DRAFT",
+            }}
+          />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

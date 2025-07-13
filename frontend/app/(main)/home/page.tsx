@@ -6,6 +6,7 @@ import { DashboardLayout } from "@/components/dashboard-layout";
 
 import { Card, CardContent } from "@/components/ui/card";
 import { GigCard } from "@/components/gig-cards";
+import Link from "next/link";
 
 // Sample data for recent gigs
 const recentGigs = [
@@ -104,9 +105,12 @@ export default function DashboardHome() {
           <Button
             size="lg"
             className="bg-purple-600 hover:bg-purple-700 text-white px-8 py-4 text-lg"
+            asChild
           >
-            <Plus className="mr-2 h-5 w-5" />
-            Create Your Gig
+            <Link href="/gigs">
+              <Plus className="mr-2 h-5 w-5" />
+              Create Your Gig
+            </Link>
           </Button>
         </div>
       </div>
