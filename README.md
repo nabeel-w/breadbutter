@@ -1,8 +1,4 @@
-Here’s a detailed and professional `README.md` file for your BreadButter project, including architecture overview, feature list, deployment stack, and rationale for your Prisma schema:
-
-----------
-
-# BreadButter – Creative Talent Matchmaking Engine
+# Creative Talent Matchmaking Engine
 
 BreadButter is a smart matchmaking engine built to connect clients with the most relevant creative talents from a pool of 10,000+ professionals. Clients submit briefs (e.g., _“I need a travel photographer in Goa for 3 days in November. Budget ₹75k. Style: Pastel tones, candid portraits.”_), and the system returns a ranked, explainable list of ideal candidates.
 
@@ -51,6 +47,12 @@ Hosting	|Vercel (frontend), Render (backend)
 
 
 ----------
+
+## Flow Chart 
+
+![Architecture Diagram](https://n7kqygiqp6.ufs.sh/f/mFmI2gxKCNA0Npe0VgMS60jyZ7vHsFW3a1ChDkluqdxMEG4V)
+
+---
 
 ## 📊 Data Model (Prisma Schema)
 
