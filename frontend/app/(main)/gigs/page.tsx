@@ -12,41 +12,7 @@ import { GigForm } from "@/components/form/gig-form";
 import { useSelector } from "react-redux";
 import { RootState } from "@/app/redux/store";
 import { GigStatus } from "@prisma/client";
-
-// Sample data for user's gigs
-const userGigs = [
-  {
-    id: "1",
-    title: "React Developer for E-commerce Platform",
-    status: "active",
-    budget: "$3,500",
-    deadline: "2024-02-15",
-    progress: 65,
-    client: "TechCorp Inc.",
-    description: "Building a modern e-commerce platform with React and Node.js",
-  },
-  {
-    id: "2",
-    title: "Mobile App UI Design",
-    status: "completed",
-    budget: "$1,200",
-    deadline: "2024-01-20",
-    progress: 100,
-    client: "StartupXYZ",
-    description:
-      "Designed complete UI/UX for iOS and Android mobile application",
-  },
-  {
-    id: "3",
-    title: "Content Writing for Tech Blog",
-    status: "pending",
-    budget: "$800",
-    deadline: "2024-02-28",
-    progress: 0,
-    client: "Digital Media Co.",
-    description: "Writing 10 technical articles about AI and machine learning",
-  },
-];
+import Link from "next/link";
 
 const getStatusColor = (status: string) => {
   switch (status) {
@@ -134,76 +100,78 @@ export default function YourGigs() {
           </div>
         ) : (
           gigs.map((gig) => (
-            <Card
-              key={gig.id}
-              className="bg-gray-800/50 border-gray-700 hover:border-purple-600/50 transition-all duration-300"
-            >
-              <CardContent className="p-6">
-                <div className="flex items-start justify-between mb-4">
-                  <div className="flex-1">
-                    <div className="flex items-center space-x-3 mb-2">
-                      <h3 className="text-xl font-semibold text-white">
-                        {gig.title}
-                      </h3>
-                      <Badge className={getStatusColor(gig.status)}>
-                        {gig.status.charAt(0).toUpperCase() +
-                          gig.status.slice(1)}
-                      </Badge>
+            <Link key={gig.id} href={`/gigs/${gig.id}`}>
+              <Card
+                className="bg-gray-800/50 border-gray-700 hover:border-purple-600/50 transition-all duration-300 m-4"
+              >
+                <CardContent className="p-6">
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="flex-1">
+                      <div className="flex items-center space-x-3 mb-2">
+                        <h3 className="text-xl font-semibold text-white">
+                          {gig.title}
+                        </h3>
+                        <Badge className={getStatusColor(gig.status)}>
+                          {gig.status.charAt(0).toUpperCase() +
+                            gig.status.slice(1)}
+                        </Badge>
+                      </div>
+                      <p className="text-gray-300 mb-3">{gig.description}</p>
+                      {/* <p className="text-gray-400 text-sm">Client: {gig.}</p> */}
                     </div>
-                    <p className="text-gray-300 mb-3">{gig.description}</p>
-                    {/* <p className="text-gray-400 text-sm">Client: {gig.}</p> */}
                   </div>
-                </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                  <div className="flex items-center text-gray-400">
-                    <DollarSign className="h-4 w-4 mr-2" />
-                    <span>{`${gig.budgetMin} - ${gig.budgetMax}`}</span>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                    <div className="flex items-center text-gray-400">
+                      <DollarSign className="h-4 w-4 mr-2" />
+                      <span>{`${gig.budgetMin} - ${gig.budgetMax}`}</span>
+                    </div>
+                    <div className="flex items-center text-gray-400">
+                      <Calendar className="h-4 w-4 mr-2" />
+                      <span>
+                        Created At:{" "}
+                        {new Date(gig.createdAt).toLocaleDateString()}
+                      </span>
+                    </div>
                   </div>
-                  <div className="flex items-center text-gray-400">
-                    <Calendar className="h-4 w-4 mr-2" />
-                    <span>
-                      Created At: {new Date(gig.createdAt).toLocaleDateString()}
-                    </span>
-                  </div>
-                </div>
 
-                <div className="flex items-center justify-between pt-4 border-t border-gray-700">
-                  <div className="flex space-x-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="border-gray-600 text-gray-300 hover:bg-gray-700 hover:text-white bg-transparent"
-                    >
-                      View Details
-                    </Button>
-                    {gig.status === GigStatus.ACTIVE && (
+                  <div className="flex items-center justify-between pt-4 border-t border-gray-700">
+                    <div className="flex space-x-2">
                       <Button
+                        variant="outline"
                         size="sm"
-                        className="bg-purple-600 hover:bg-purple-700 text-white"
+                        className="border-gray-600 text-gray-300 hover:bg-gray-700 hover:text-white bg-transparent"
                       >
-                        Update Progress
+                        View Details
                       </Button>
+                      {gig.status === GigStatus.ACTIVE && (
+                        <Button
+                          size="sm"
+                          className="bg-purple-600 hover:bg-purple-700 text-white"
+                        >
+                          Update Progress
+                        </Button>
+                      )}
+                    </div>
+                    {gig.status === GigStatus.COMPLETED && (
+                      <Badge className="bg-green-600/20 text-green-300 border-green-600/30">
+                        ✓ Completed
+                      </Badge>
+                    )}
+                    {gig.status === GigStatus.PENDING && (
+                      <Badge className="bg-yellow-600/20 text-yellow-300 border-yellow-600/30">
+                        Pending
+                      </Badge>
+                    )}
+                    {gig.status === GigStatus.TALENT_RECOMMENDED && (
+                      <Badge className="bg-purple-600/20 text-purple-300 border-purple-600/30">
+                        Talents Recommended
+                      </Badge>
                     )}
                   </div>
-                  {gig.status === GigStatus.COMPLETED && (
-                    <Badge className="bg-green-600/20 text-green-300 border-green-600/30">
-                      ✓ Completed
-                    </Badge>
-                  )}
-                  {gig.status === GigStatus.PENDING && (
-                    <Badge className="bg-yellow-600/20 text-yellow-300 border-yellow-600/30">
-                      Pending
-                    </Badge>
-                  )}
-                  {gig.status === GigStatus.TALENT_RECOMMENDED && (
-                    <Badge className="bg-purple-600/20 text-purple-300 border-purple-600/30">
-                      Talents Recommended
-                    </Badge>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+            </Link>
           ))
         )}
       </div>

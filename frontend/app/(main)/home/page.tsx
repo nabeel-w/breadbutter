@@ -104,25 +104,26 @@ export default function DashboardHome() {
           </div>
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {gigs
+            {[...gigs]
               .sort(
-          (a, b) =>
-            new Date(b.createdAt).getTime() -
-            new Date(a.createdAt).getTime()
+                (a, b) =>
+                  new Date(b.createdAt).getTime() -
+                  new Date(a.createdAt).getTime()
               )
               .slice(0, 4)
               .map((gig) => (
-          <GigCard
-            key={gig.id}
-            id={gig.id}
-            title={gig.title}
-            description={gig.description}
-            budget={`${gig.budgetMin} - ${gig.budgetMax}`}
-            // timeframe={gig.timeframe}
-            skills={gig.skills}
-            recommendations={gig.Recommendations.length}
-            postedTime={new Date(gig.createdAt).toLocaleDateString()}
-          />
+                <Link key={gig.id} href={`/gigs/${gig.id}`}>
+                  <GigCard
+                    id={gig.id}
+                    title={gig.title}
+                    description={gig.description}
+                    budget={`${gig.budgetMin} - ${gig.budgetMax}`}
+                    // timeframe={gig.timeframe}
+                    skills={gig.skills}
+                    recommendations={gig.Recommendations.length}
+                    postedTime={new Date(gig.createdAt).toLocaleDateString()}
+                  />
+                </Link>
               ))}
           </div>
         )}

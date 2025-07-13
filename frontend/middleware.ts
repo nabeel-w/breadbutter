@@ -16,9 +16,6 @@ export default clerkMiddleware(async (auth, req) => {
   const isOnboarding = isOnboardingRoute(req);
   const isOnboardingComplete = sessionClaims?.metadata.onboardingComplete;
 
-  console.log("Middleware userId:", userId);
-  console.log("Middleware sessionClaims:", sessionClaims);
-
   if (isOnboarding && !userId) {
     // Handle onboarding route logic
     return redirectToSignIn();
