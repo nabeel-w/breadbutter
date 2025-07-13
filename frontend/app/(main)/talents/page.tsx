@@ -16,143 +16,14 @@ import {
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { useState } from "react";
 import { TalentForm } from "@/components/form/talent-form";
+import { RootState } from "@/app/redux/store";
+import { useSelector } from "react-redux";
 
-// Sample data for talents
-const talents = [
-  {
-    id: "1",
-    name: "Sarah Johnson",
-    city: "New York, NY",
-    categories: ["UI/UX Design", "Web Design", "Mobile Design"],
-    skills: ["Figma", "Adobe XD", "Sketch", "Prototyping", "User Research"],
-    experienceYears: 5,
-    budgetMin: 75,
-    budgetMax: 120,
-    portfolioLinks: [
-      "https://sarahjohnson.design",
-      "https://dribbble.com/sarahj",
-    ],
-    rating: 4.9,
-    completedProjects: 47,
-    joinedDate: "Jan 2023",
-    isAvailable: true,
-  },
-  {
-    id: "2",
-    name: "Mike Chen",
-    city: "San Francisco, CA",
-    categories: ["Full-Stack Development", "React", "Node.js"],
-    skills: ["React", "Node.js", "TypeScript", "MongoDB", "AWS", "Docker"],
-    experienceYears: 7,
-    budgetMin: 90,
-    budgetMax: 150,
-    portfolioLinks: ["https://mikechen.dev", "https://github.com/mikechen"],
-    rating: 4.8,
-    completedProjects: 62,
-    joinedDate: "Mar 2022",
-    isAvailable: true,
-  },
-  {
-    id: "3",
-    name: "Emma Davis",
-    city: "London, UK",
-    categories: ["Content Writing", "SEO", "Digital Marketing"],
-    skills: [
-      "Content Strategy",
-      "SEO",
-      "Google Analytics",
-      "Social Media",
-      "Copywriting",
-    ],
-    experienceYears: 4,
-    budgetMin: 45,
-    budgetMax: 75,
-    portfolioLinks: [
-      "https://emmadavis.writer",
-      "https://medium.com/@emmadavis",
-    ],
-    rating: 4.7,
-    completedProjects: 89,
-    joinedDate: "Aug 2022",
-    isAvailable: false,
-  },
-  {
-    id: "4",
-    name: "Alex Rivera",
-    city: "Remote",
-    categories: ["Mobile Development", "iOS", "Android"],
-    skills: ["Swift", "Kotlin", "React Native", "Flutter", "Firebase"],
-    experienceYears: 6,
-    budgetMin: 80,
-    budgetMax: 130,
-    portfolioLinks: ["https://alexrivera.dev", "https://apps.alexrivera.dev"],
-    rating: 4.9,
-    completedProjects: 34,
-    joinedDate: "Nov 2022",
-    isAvailable: true,
-  },
-  {
-    id: "5",
-    name: "Lisa Wang",
-    city: "Toronto, CA",
-    categories: ["Graphic Design", "Branding", "Illustration"],
-    skills: [
-      "Adobe Illustrator",
-      "Photoshop",
-      "InDesign",
-      "Branding",
-      "Logo Design",
-    ],
-    experienceYears: 8,
-    budgetMin: 60,
-    budgetMax: 100,
-    portfolioLinks: ["https://lisawang.design", "https://behance.net/lisawang"],
-    rating: 4.8,
-    completedProjects: 156,
-    joinedDate: "Feb 2021",
-    isAvailable: true,
-  },
-  {
-    id: "6",
-    name: "David Kim",
-    city: "Seoul, KR",
-    categories: ["Data Science", "Machine Learning", "Python"],
-    skills: ["Python", "TensorFlow", "PyTorch", "SQL", "Data Visualization"],
-    experienceYears: 5,
-    budgetMin: 70,
-    budgetMax: 110,
-    portfolioLinks: ["https://davidkim.ai", "https://kaggle.com/davidkim"],
-    rating: 4.6,
-    completedProjects: 28,
-    joinedDate: "Jun 2023",
-    isAvailable: true,
-  },
-];
-
-const stats = [
-  {
-    title: "Total Talents",
-    value: "52,341",
-    icon: Users,
-    change: "+8%",
-  },
-  {
-    title: "Available Now",
-    value: "12,847",
-    icon: TrendingUp,
-    change: "+15%",
-  },
-  {
-    title: "Avg. Rating",
-    value: "4.8",
-    icon: Star,
-    change: "+0.2",
-  },
-];
 
 export default function TalentsPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [isOpen, setIsOpen] = useState(false);
+  const { talents } = useSelector((state: RootState) => state.talent); // Assuming talents data is stored in Redux
   return (
     <div className="p-6 lg:p-8">
       {/* Hero Section */}
@@ -301,11 +172,17 @@ export default function TalentsPage() {
           </Button>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {talents.map((talent) => (
-            <TalentCard key={talent.id} {...talent} />
-          ))}
-        </div>
+        {talents.length === 0 ? (
+          <div className="text-gray-400 text-center py-12">
+            No talents found. Be the first to create a talent profile!
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {talents.map((talent) => (
+              <TalentCard joinedDate={""} key={talent.id} {...talent} />
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Categories Section */}

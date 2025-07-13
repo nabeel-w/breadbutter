@@ -1,31 +1,47 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { useForm } from "react-hook-form"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { MultiSelectInput } from "../multi-select-input"
-import { Briefcase, DollarSign, MapPin, Palette, Tag, FileText } from "lucide-react"
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { MultiSelectInput } from "../multi-select-input";
+import {
+  Briefcase,
+  DollarSign,
+  MapPin,
+  Palette,
+  Tag,
+  FileText,
+} from "lucide-react";
+import { toast } from "sonner";
+import { createGigThunk } from "@/app/redux/slices/gigsSlice";
+import { useAppDispatch } from "@/app/redux/useDispatch";
 
-interface GigFormData {
-  title: string
-  description: string
-  location?: string
-  budgetMin?: number
-  budgetMax?: number
-  stylePreferences: string[]
-  category: string
-  skills: string[]
-  status: "DRAFT" | "PUBLISHED" | "CLOSED"
+export interface GigFormData {
+  title: string;
+  description: string;
+  location?: string;
+  budgetMin?: number;
+  budgetMax?: number;
+  stylePreferences: string[];
+  category: string;
+  skills: string[];
+  status: "DRAFT" | "PUBLISHED" | "CLOSED";
 }
 
 interface GigFormProps {
-  onSubmit: (data: GigFormData) => void
-  initialData?: Partial<GigFormData>
-  isLoading?: boolean
+  onSubmit: () => void;
+  initialData?: Partial<GigFormData>;
+  isLoading?: boolean;
 }
 
 const categories = [
@@ -39,7 +55,7 @@ const categories = [
   "Graphic Design",
   "Video Editing",
   "Photography",
-]
+];
 
 const stylePreferencesOptions = [
   "Minimalist",
@@ -52,7 +68,7 @@ const stylePreferencesOptions = [
   "Elegant",
   "Rustic",
   "Futuristic",
-]
+];
 
 const skillsOptions = [
   "Figma",
@@ -70,11 +86,18 @@ const skillsOptions = [
   "AWS",
   "Google Analytics",
   "Social Media Marketing",
-]
+];
 
-export function GigForm({ onSubmit, initialData, isLoading = false }: GigFormProps) {
-  const [stylePreferences, setStylePreferences] = useState<string[]>(initialData?.stylePreferences || [])
-  const [skills, setSkills] = useState<string[]>(initialData?.skills || [])
+export function GigForm({
+  onSubmit,
+  initialData,
+  isLoading = false,
+}: GigFormProps) {
+  const [stylePreferences, setStylePreferences] = useState<string[]>(
+    initialData?.stylePreferences || []
+  );
+  const [skills, setSkills] = useState<string[]>(initialData?.skills || []);
+  const dispatch = useAppDispatch();
 
   const {
     register,
@@ -92,15 +115,35 @@ export function GigForm({ onSubmit, initialData, isLoading = false }: GigFormPro
       category: initialData?.category || "",
       status: initialData?.status || "DRAFT",
     },
-  })
+  });
 
-  const handleFormSubmit = (data: GigFormData) => {
-    onSubmit({
-      ...data,
-      stylePreferences,
-      skills,
-    })
-  }
+  const handleFormSubmit = async (data: GigFormData) => {
+    const toastId = toast.loading("Creating gig...");
+    try {
+      const res = await dispatch(
+        createGigThunk({
+          data: {
+            ...data,
+          },
+        })
+      );
+      if (createGigThunk.rejected.match(res)) {
+        throw new Error(res.error.message);
+      }
+      toast.success("Gig created successfully!", {
+        id: toastId,
+      });
+    } catch (error) {
+      console.error("Error creating gig:", error);
+      toast.error("Failed to create gig. Please try again.", {
+        id: toastId,
+      });
+      return;
+    } finally {
+      toast.dismiss(toastId);
+      onSubmit();
+    }
+  };
 
   return (
     <Card className="bg-gray-800/50 border-gray-700 max-w-4xl mx-auto">
@@ -123,19 +166,29 @@ export function GigForm({ onSubmit, initialData, isLoading = false }: GigFormPro
               placeholder="e.g. Modern Website Design for Tech Startup"
               className="bg-gray-800 border-gray-700 text-white placeholder-gray-400"
             />
-            {errors.title && <p className="text-red-400 text-sm">{errors.title.message}</p>}
+            {errors.title && (
+              <p className="text-red-400 text-sm">{errors.title.message}</p>
+            )}
           </div>
 
           {/* Description */}
           <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-300">Description *</label>
+            <label className="text-sm font-medium text-gray-300">
+              Description *
+            </label>
             <Textarea
-              {...register("description", { required: "Description is required" })}
+              {...register("description", {
+                required: "Description is required",
+              })}
               placeholder="Describe your project requirements, goals, and expectations..."
               rows={4}
               className="bg-gray-800 border-gray-700 text-white placeholder-gray-400"
             />
-            {errors.description && <p className="text-red-400 text-sm">{errors.description.message}</p>}
+            {errors.description && (
+              <p className="text-red-400 text-sm">
+                {errors.description.message}
+              </p>
+            )}
           </div>
 
           {/* Location */}
@@ -191,13 +244,19 @@ export function GigForm({ onSubmit, initialData, isLoading = false }: GigFormPro
               </SelectTrigger>
               <SelectContent className="bg-gray-800 border-gray-700">
                 {categories.map((category) => (
-                  <SelectItem key={category} value={category} className="text-white hover:bg-gray-700">
+                  <SelectItem
+                    key={category}
+                    value={category}
+                    className="text-white hover:bg-gray-700"
+                  >
                     {category}
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
-            {errors.category && <p className="text-red-400 text-sm">{errors.category.message}</p>}
+            {errors.category && (
+              <p className="text-red-400 text-sm">{errors.category.message}</p>
+            )}
           </div>
 
           {/* Style Preferences */}
@@ -226,18 +285,31 @@ export function GigForm({ onSubmit, initialData, isLoading = false }: GigFormPro
           {/* Status */}
           <div className="space-y-2">
             <label className="text-sm font-medium text-gray-300">Status</label>
-            <Select onValueChange={(value) => setValue("status", value as "DRAFT" | "PUBLISHED" | "CLOSED")}>
+            <Select
+              onValueChange={(value) =>
+                setValue("status", value as "DRAFT" | "PUBLISHED" | "CLOSED")
+              }
+            >
               <SelectTrigger className="bg-gray-800 border-gray-700 text-white">
                 <SelectValue placeholder="Select status" />
               </SelectTrigger>
               <SelectContent className="bg-gray-800 border-gray-700">
-                <SelectItem value="DRAFT" className="text-white hover:bg-gray-700">
+                <SelectItem
+                  value="DRAFT"
+                  className="text-white hover:bg-gray-700"
+                >
                   Draft
                 </SelectItem>
-                <SelectItem value="PUBLISHED" className="text-white hover:bg-gray-700">
+                <SelectItem
+                  value="PUBLISHED"
+                  className="text-white hover:bg-gray-700"
+                >
                   Published
                 </SelectItem>
-                <SelectItem value="CLOSED" className="text-white hover:bg-gray-700">
+                <SelectItem
+                  value="CLOSED"
+                  className="text-white hover:bg-gray-700"
+                >
                   Closed
                 </SelectItem>
               </SelectContent>
@@ -253,12 +325,16 @@ export function GigForm({ onSubmit, initialData, isLoading = false }: GigFormPro
             >
               Save as Draft
             </Button>
-            <Button type="submit" disabled={isLoading} className="bg-purple-600 hover:bg-purple-700 text-white">
+            <Button
+              type="submit"
+              disabled={isLoading}
+              className="bg-purple-600 hover:bg-purple-700 text-white"
+            >
               {isLoading ? "Creating..." : "Publish Gig"}
             </Button>
           </div>
         </form>
       </CardContent>
     </Card>
-  )
+  );
 }

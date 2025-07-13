@@ -2,67 +2,11 @@
 
 import { Button } from "@/components/ui/button";
 import { Plus, TrendingUp, Users, DollarSign } from "lucide-react";
-import { DashboardLayout } from "@/components/dashboard-layout";
-
 import { Card, CardContent } from "@/components/ui/card";
 import { GigCard } from "@/components/gig-cards";
 import Link from "next/link";
-
-// Sample data for recent gigs
-const recentGigs = [
-  {
-    id: "1",
-    title: "Full-Stack Web Application Development",
-    description:
-      "Looking for an experienced developer to build a modern web application using React and Node.js. The project includes user authentication, payment integration, and a responsive design.",
-    budget: "$2,000 - $5,000",
-    timeframe: "2-3 months",
-    skills: ["React", "Node.js", "MongoDB", "TypeScript", "Stripe"],
-    rating: 4.9,
-    clientName: "Sarah Johnson",
-    postedTime: "2 hours ago",
-    proposals: 12,
-  },
-  {
-    id: "2",
-    title: "Mobile App UI/UX Design",
-    description:
-      "Need a talented designer to create a modern and intuitive mobile app design for iOS and Android. Must include wireframes, prototypes, and final designs.",
-    budget: "$800 - $1,500",
-    timeframe: "3-4 weeks",
-    skills: ["Figma", "UI/UX Design", "Mobile Design", "Prototyping"],
-    rating: 4.8,
-    clientName: "Mike Chen",
-    postedTime: "5 hours ago",
-    proposals: 8,
-  },
-  {
-    id: "3",
-    title: "Content Writing for Tech Blog",
-    description:
-      "Seeking a skilled content writer to create engaging blog posts about emerging technologies, AI, and software development trends.",
-    budget: "$50 - $100 per article",
-    timeframe: "Ongoing",
-    skills: ["Content Writing", "Technical Writing", "SEO", "Research"],
-    rating: 4.7,
-    clientName: "Alex Rivera",
-    postedTime: "1 day ago",
-    proposals: 15,
-  },
-  {
-    id: "4",
-    title: "E-commerce Website Optimization",
-    description:
-      "Looking for an expert to optimize our existing e-commerce website for better performance, SEO, and conversion rates.",
-    budget: "$1,200 - $2,500",
-    timeframe: "1-2 months",
-    skills: ["SEO", "Performance Optimization", "E-commerce", "Analytics"],
-    rating: 4.6,
-    clientName: "Emma Davis",
-    postedTime: "2 days ago",
-    proposals: 6,
-  },
-];
+import { RootState } from "@/app/redux/store";
+import { useSelector } from "react-redux";
 
 const stats = [
   {
@@ -72,7 +16,7 @@ const stats = [
     change: "+12%",
   },
   {
-    title: "Total Freelancers",
+    title: "Total Talents",
     value: "52,341",
     icon: Users,
     change: "+8%",
@@ -86,6 +30,7 @@ const stats = [
 ];
 
 export default function DashboardHome() {
+  const { gigs } = useSelector((state: RootState) => state.gigs);
   return (
     <div className="p-6 lg:p-8">
       {/* Hero Section */}
@@ -99,8 +44,8 @@ export default function DashboardHome() {
             </span>
           </h1>
           <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
-            Discover amazing talent that match your skills and budget 
-            today. From thousands of successful freelancers on Bread Butter.
+            Discover amazing talent that match your skills and budget today.
+            From thousands of successful freelancers on Bread Butter.
           </p>
           <Button
             size="lg"
@@ -153,11 +98,34 @@ export default function DashboardHome() {
           </Button>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {recentGigs.map((gig) => (
-            <GigCard key={gig.id} {...gig} />
-          ))}
-        </div>
+        {gigs.length === 0 ? (
+          <div className="text-gray-400 text-center py-12">
+            No gigs found. Create your first gig to get started!
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {gigs
+              .sort(
+          (a, b) =>
+            new Date(b.createdAt).getTime() -
+            new Date(a.createdAt).getTime()
+              )
+              .slice(0, 4)
+              .map((gig) => (
+          <GigCard
+            key={gig.id}
+            id={gig.id}
+            title={gig.title}
+            description={gig.description}
+            budget={`${gig.budgetMin} - ${gig.budgetMax}`}
+            // timeframe={gig.timeframe}
+            skills={gig.skills}
+            recommendations={gig.Recommendations.length}
+            postedTime={new Date(gig.createdAt).toLocaleDateString()}
+          />
+              ))}
+          </div>
+        )}
       </div>
 
       {/* Quick Actions */}

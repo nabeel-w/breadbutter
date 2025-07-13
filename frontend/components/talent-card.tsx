@@ -1,24 +1,31 @@
-"use client"
+"use client";
 
-import { Card, CardContent } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Star, MapPin, DollarSign, User, Briefcase, Calendar } from "lucide-react"
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  Star,
+  MapPin,
+  DollarSign,
+  User,
+  Briefcase,
+  Calendar,
+} from "lucide-react";
 
 interface TalentCardProps {
-  id: string
-  name: string
-  city: string
-  categories: string[]
-  skills: string[]
-  experienceYears: number
-  budgetMin: number
-  budgetMax: number
-  portfolioLinks: string[]
-  rating?: number
-  completedProjects?: number
-  joinedDate: string
-  isAvailable?: boolean
+  id: string;
+  name: string;
+  city: string;
+  categories: string[];
+  skills: string[];
+  experienceYears: number;
+  budgetMin: number;
+  budgetMax: number;
+  portfolioLinks: string[];
+  rating?: number;
+  completedProjects?: number;
+  joinedDate: string;
+  isAvailable?: boolean;
 }
 
 export function TalentCard({
@@ -31,7 +38,7 @@ export function TalentCard({
   budgetMin,
   budgetMax,
   portfolioLinks,
-  rating,
+  rating = 5,
   completedProjects = 0,
   joinedDate,
   isAvailable = true,
@@ -75,7 +82,10 @@ export function TalentCard({
         {/* Categories */}
         <div className="flex flex-wrap gap-2 mb-4">
           {categories.slice(0, 3).map((category) => (
-            <Badge key={category} className="bg-purple-600/20 text-purple-300 border-purple-600/30">
+            <Badge
+              key={category}
+              className="bg-purple-600/20 text-purple-300 border-purple-600/30"
+            >
               {category}
             </Badge>
           ))}
@@ -89,12 +99,19 @@ export function TalentCard({
         {/* Skills */}
         <div className="flex flex-wrap gap-1 mb-4">
           {skills.slice(0, 4).map((skill) => (
-            <Badge key={skill} variant="secondary" className="bg-gray-700 text-gray-300 hover:bg-gray-600 text-xs">
+            <Badge
+              key={skill}
+              variant="secondary"
+              className="bg-gray-700 text-gray-300 hover:bg-gray-600 text-xs"
+            >
               {skill}
             </Badge>
           ))}
           {skills.length > 4 && (
-            <Badge variant="secondary" className="bg-gray-700 text-gray-300 text-xs">
+            <Badge
+              variant="secondary"
+              className="bg-gray-700 text-gray-300 text-xs"
+            >
               +{skills.length - 4} more
             </Badge>
           )}
@@ -131,12 +148,15 @@ export function TalentCard({
             >
               View Profile
             </Button>
-            <Button size="sm" className="bg-purple-600 hover:bg-purple-700 text-white">
+            <Button
+              size="sm"
+              className="bg-purple-600 hover:bg-purple-700 text-white"
+            >
               Contact
             </Button>
           </div>
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }

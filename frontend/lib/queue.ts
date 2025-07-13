@@ -3,4 +3,5 @@ import { Redis } from 'ioredis';
 
 const connection = new Redis(process.env.REDIS_URL);
 
-export const myQueue = new Queue('breadbutter-queue', { connection });
+export const talentQueue = new Queue('talent-queue', { connection });
+export const gigQueue = new Queue('gig-queue', { connection });

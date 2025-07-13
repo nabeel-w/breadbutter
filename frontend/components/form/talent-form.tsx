@@ -1,29 +1,47 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { useForm } from "react-hook-form"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { MultiSelectInput } from "../multi-select-input"
-import { User, MapPin, Briefcase, Star, DollarSign, Link, Plus, X } from "lucide-react"
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { MultiSelectInput } from "../multi-select-input";
+import {
+  User,
+  MapPin,
+  Briefcase,
+  Star,
+  DollarSign,
+  Link,
+  Plus,
+  X,
+} from "lucide-react";
+import { toast } from "sonner";
+import { useAppDispatch } from "@/app/redux/useDispatch";
+import { createTalentThunk } from "@/app/redux/slices/talentSlice";
 
-interface TalentFormData {
-  name: string
-  city: string
-  categories: string[]
-  skills: string[]
-  experienceYears: number
-  budgetMin: number
-  budgetMax: number
-  portfolioLinks: string[]
+export interface TalentFormData {
+  name: string;
+  city: string;
+  categories: string[];
+  skills: string[];
+  experienceYears: number;
+  budgetMin: number;
+  budgetMax: number;
+  portfolioLinks: string[];
 }
 
 interface TalentFormProps {
-  onSubmit: (data: TalentFormData) => void
-  initialData?: Partial<TalentFormData>
-  isLoading?: boolean
+  onSubmit: () => void;
+  initialData?: Partial<TalentFormData>;
+  isLoading?: boolean;
 }
 
 const categoriesOptions = [
@@ -37,7 +55,7 @@ const categoriesOptions = [
   "Business",
   "Lifestyle",
   "Photography",
-]
+];
 
 const skillsOptions = [
   "Figma",
@@ -60,13 +78,22 @@ const skillsOptions = [
   "UI/UX Design",
   "Graphic Design",
   "Digital Marketing",
-]
+];
 
-export function TalentForm({ onSubmit, initialData, isLoading = false }: TalentFormProps) {
-  const [categories, setCategories] = useState<string[]>(initialData?.categories || [])
-  const [skills, setSkills] = useState<string[]>(initialData?.skills || [])
-  const [portfolioLinks, setPortfolioLinks] = useState<string[]>(initialData?.portfolioLinks || [])
-  const [newPortfolioLink, setNewPortfolioLink] = useState("")
+export function TalentForm({
+  onSubmit,
+  initialData,
+  isLoading = false,
+}: TalentFormProps) {
+  const [categories, setCategories] = useState<string[]>(
+    initialData?.categories || []
+  );
+  const [skills, setSkills] = useState<string[]>(initialData?.skills || []);
+  const [portfolioLinks, setPortfolioLinks] = useState<string[]>(
+    initialData?.portfolioLinks || []
+  );
+  const [newPortfolioLink, setNewPortfolioLink] = useState("");
+  const dispatch = useAppDispatch();
 
   const {
     register,
@@ -81,27 +108,46 @@ export function TalentForm({ onSubmit, initialData, isLoading = false }: TalentF
       budgetMin: initialData?.budgetMin || 0,
       budgetMax: initialData?.budgetMax || 0,
     },
-  })
+  });
 
   const addPortfolioLink = () => {
-    if (newPortfolioLink.trim() && !portfolioLinks.includes(newPortfolioLink.trim())) {
-      setPortfolioLinks([...portfolioLinks, newPortfolioLink.trim()])
-      setNewPortfolioLink("")
+    if (
+      newPortfolioLink.trim() &&
+      !portfolioLinks.includes(newPortfolioLink.trim())
+    ) {
+      setPortfolioLinks([...portfolioLinks, newPortfolioLink.trim()]);
+      setNewPortfolioLink("");
     }
-  }
+  };
 
   const removePortfolioLink = (index: number) => {
-    setPortfolioLinks(portfolioLinks.filter((_, i) => i !== index))
-  }
+    setPortfolioLinks(portfolioLinks.filter((_, i) => i !== index));
+  };
 
   const handleFormSubmit = (data: TalentFormData) => {
-    onSubmit({
-      ...data,
-      categories,
-      skills,
-      portfolioLinks,
-    })
-  }
+    const toastId = toast.loading("Creating talent profile...");
+    try {
+      const res = dispatch(
+        createTalentThunk({
+          data: {
+            ...data,
+          },
+        })
+      );
+      if (createTalentThunk.rejected.match(res)) {
+        throw new Error(res.error.message);
+      }
+      toast.success("Talent profile created successfully!", { id: toastId });
+    } catch (error) {
+      console.error("Error creating talent profile:", error);
+      toast.error("Failed to create talent profile. Please try again.", {
+        id: toastId,
+      });
+    } finally {
+      toast.dismiss(toastId);
+      onSubmit();
+    }
+  };
 
   return (
     <Card className="bg-gray-800/50 border-gray-700 max-w-4xl mx-auto">
@@ -124,7 +170,9 @@ export function TalentForm({ onSubmit, initialData, isLoading = false }: TalentF
               placeholder="e.g. John Doe"
               className="bg-gray-800 border-gray-700 text-white placeholder-gray-400"
             />
-            {errors.name && <p className="text-red-400 text-sm">{errors.name.message}</p>}
+            {errors.name && (
+              <p className="text-red-400 text-sm">{errors.name.message}</p>
+            )}
           </div>
 
           {/* City */}
@@ -138,7 +186,9 @@ export function TalentForm({ onSubmit, initialData, isLoading = false }: TalentF
               placeholder="e.g. New York, London, Remote"
               className="bg-gray-800 border-gray-700 text-white placeholder-gray-400"
             />
-            {errors.city && <p className="text-red-400 text-sm">{errors.city.message}</p>}
+            {errors.city && (
+              <p className="text-red-400 text-sm">{errors.city.message}</p>
+            )}
           </div>
 
           {/* Categories */}
@@ -170,7 +220,11 @@ export function TalentForm({ onSubmit, initialData, isLoading = false }: TalentF
               <Star className="mr-2 h-4 w-4" />
               Years of Experience *
             </label>
-            <Select onValueChange={(value) => setValue("experienceYears", Number.parseInt(value))}>
+            <Select
+              onValueChange={(value) =>
+                setValue("experienceYears", Number.parseInt(value))
+              }
+            >
               <SelectTrigger className="bg-gray-800 border-gray-700 text-white">
                 <SelectValue placeholder="Select experience level" />
               </SelectTrigger>
@@ -198,7 +252,11 @@ export function TalentForm({ onSubmit, initialData, isLoading = false }: TalentF
                 </SelectItem>
               </SelectContent>
             </Select>
-            {errors.experienceYears && <p className="text-red-400 text-sm">{errors.experienceYears.message}</p>}
+            {errors.experienceYears && (
+              <p className="text-red-400 text-sm">
+                {errors.experienceYears.message}
+              </p>
+            )}
           </div>
 
           {/* Budget Range */}
@@ -218,7 +276,11 @@ export function TalentForm({ onSubmit, initialData, isLoading = false }: TalentF
                 placeholder="25"
                 className="bg-gray-800 border-gray-700 text-white placeholder-gray-400"
               />
-              {errors.budgetMin && <p className="text-red-400 text-sm">{errors.budgetMin.message}</p>}
+              {errors.budgetMin && (
+                <p className="text-red-400 text-sm">
+                  {errors.budgetMin.message}
+                </p>
+              )}
             </div>
             <div className="space-y-2">
               <label className="text-sm font-medium text-gray-300 flex items-center">
@@ -235,7 +297,11 @@ export function TalentForm({ onSubmit, initialData, isLoading = false }: TalentF
                 placeholder="100"
                 className="bg-gray-800 border-gray-700 text-white placeholder-gray-400"
               />
-              {errors.budgetMax && <p className="text-red-400 text-sm">{errors.budgetMax.message}</p>}
+              {errors.budgetMax && (
+                <p className="text-red-400 text-sm">
+                  {errors.budgetMax.message}
+                </p>
+              )}
             </div>
           </div>
 
@@ -250,9 +316,14 @@ export function TalentForm({ onSubmit, initialData, isLoading = false }: TalentF
             {portfolioLinks.length > 0 && (
               <div className="space-y-2">
                 {portfolioLinks.map((link, index) => (
-                  <div key={index} className="flex items-center gap-2 p-2 bg-gray-700/50 rounded-md">
+                  <div
+                    key={index}
+                    className="flex items-center gap-2 p-2 bg-gray-700/50 rounded-md"
+                  >
                     <Link className="h-4 w-4 text-purple-400" />
-                    <span className="text-gray-300 flex-1 truncate">{link}</span>
+                    <span className="text-gray-300 flex-1 truncate">
+                      {link}
+                    </span>
                     <Button
                       type="button"
                       variant="ghost"
@@ -276,12 +347,17 @@ export function TalentForm({ onSubmit, initialData, isLoading = false }: TalentF
                 className="bg-gray-800 border-gray-700 text-white placeholder-gray-400"
                 onKeyDown={(e) => {
                   if (e.key === "Enter") {
-                    e.preventDefault()
-                    addPortfolioLink()
+                    e.preventDefault();
+                    addPortfolioLink();
                   }
                 }}
               />
-              <Button type="button" onClick={addPortfolioLink} size="sm" className="bg-purple-600 hover:bg-purple-700">
+              <Button
+                type="button"
+                onClick={addPortfolioLink}
+                size="sm"
+                className="bg-purple-600 hover:bg-purple-700"
+              >
                 <Plus className="h-4 w-4" />
               </Button>
             </div>
@@ -296,12 +372,16 @@ export function TalentForm({ onSubmit, initialData, isLoading = false }: TalentF
             >
               Save as Draft
             </Button>
-            <Button type="submit" disabled={isLoading} className="bg-purple-600 hover:bg-purple-700 text-white">
+            <Button
+              type="submit"
+              disabled={isLoading}
+              className="bg-purple-600 hover:bg-purple-700 text-white"
+            >
               {isLoading ? "Creating Profile..." : "Create Profile"}
             </Button>
           </div>
         </form>
       </CardContent>
     </Card>
-  )
+  );
 }

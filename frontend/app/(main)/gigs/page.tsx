@@ -9,6 +9,9 @@ import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { GigForm } from "@/components/form/gig-form";
+import { useSelector } from "react-redux";
+import { RootState } from "@/app/redux/store";
+import { GigStatus } from "@prisma/client";
 
 // Sample data for user's gigs
 const userGigs = [
@@ -62,6 +65,7 @@ export default function YourGigs() {
   const [searchQuery, setSearchQuery] = useState("");
   const [isOpen, setIsOpen] = useState(false);
   const isTyping = searchQuery.trim().length > 0;
+  const { gigs } = useSelector((state: RootState) => state.gigs); // Assuming user data is stored in Redux
 
   return (
     <div className="p-6 lg:p-8">
@@ -75,7 +79,10 @@ export default function YourGigs() {
             Manage your active projects and find top talent for your needs.
           </p>
         </div>
-        <Button className="bg-purple-600 hover:bg-purple-700 text-white" onClick={() => setIsOpen(true)}>
+        <Button
+          className="bg-purple-600 hover:bg-purple-700 text-white"
+          onClick={() => setIsOpen(true)}
+        >
           <Plus className="mr-2 h-4 w-4" />
           Create Gig
         </Button>
@@ -121,85 +128,84 @@ export default function YourGigs() {
 
       {/* Gigs List */}
       <div className="space-y-6">
-        {userGigs.map((gig) => (
-          <Card
-            key={gig.id}
-            className="bg-gray-800/50 border-gray-700 hover:border-purple-600/50 transition-all duration-300"
-          >
-            <CardContent className="p-6">
-              <div className="flex items-start justify-between mb-4">
-                <div className="flex-1">
-                  <div className="flex items-center space-x-3 mb-2">
-                    <h3 className="text-xl font-semibold text-white">
-                      {gig.title}
-                    </h3>
-                    <Badge className={getStatusColor(gig.status)}>
-                      {gig.status.charAt(0).toUpperCase() + gig.status.slice(1)}
-                    </Badge>
+        {gigs.length === 0 ? (
+          <div className="text-center text-gray-400 py-16">
+            <p>No gigs found. Create a new gig to get started!</p>
+          </div>
+        ) : (
+          gigs.map((gig) => (
+            <Card
+              key={gig.id}
+              className="bg-gray-800/50 border-gray-700 hover:border-purple-600/50 transition-all duration-300"
+            >
+              <CardContent className="p-6">
+                <div className="flex items-start justify-between mb-4">
+                  <div className="flex-1">
+                    <div className="flex items-center space-x-3 mb-2">
+                      <h3 className="text-xl font-semibold text-white">
+                        {gig.title}
+                      </h3>
+                      <Badge className={getStatusColor(gig.status)}>
+                        {gig.status.charAt(0).toUpperCase() +
+                          gig.status.slice(1)}
+                      </Badge>
+                    </div>
+                    <p className="text-gray-300 mb-3">{gig.description}</p>
+                    {/* <p className="text-gray-400 text-sm">Client: {gig.}</p> */}
                   </div>
-                  <p className="text-gray-300 mb-3">{gig.description}</p>
-                  <p className="text-gray-400 text-sm">Client: {gig.client}</p>
                 </div>
-              </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                <div className="flex items-center text-gray-400">
-                  <DollarSign className="h-4 w-4 mr-2" />
-                  <span>{gig.budget}</span>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                  <div className="flex items-center text-gray-400">
+                    <DollarSign className="h-4 w-4 mr-2" />
+                    <span>{`${gig.budgetMin} - ${gig.budgetMax}`}</span>
+                  </div>
+                  <div className="flex items-center text-gray-400">
+                    <Calendar className="h-4 w-4 mr-2" />
+                    <span>
+                      Created At: {new Date(gig.createdAt).toLocaleDateString()}
+                    </span>
+                  </div>
                 </div>
-                <div className="flex items-center text-gray-400">
-                  <Calendar className="h-4 w-4 mr-2" />
-                  <span>
-                    Due: {new Date(gig.deadline).toLocaleDateString()}
-                  </span>
-                </div>
-                <div className="flex items-center text-gray-400">
-                  <Clock className="h-4 w-4 mr-2" />
-                  <span>{gig.progress}% Complete</span>
-                </div>
-              </div>
 
-              {/* Progress Bar */}
-              <div className="mb-4">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm text-gray-400">Progress</span>
-                  <span className="text-sm text-gray-400">{gig.progress}%</span>
-                </div>
-                <div className="w-full bg-gray-700 rounded-full h-2">
-                  <div
-                    className="bg-purple-600 h-2 rounded-full transition-all duration-300"
-                    style={{ width: `${gig.progress}%` }}
-                  ></div>
-                </div>
-              </div>
-
-              <div className="flex items-center justify-between pt-4 border-t border-gray-700">
-                <div className="flex space-x-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="border-gray-600 text-gray-300 hover:bg-gray-700 hover:text-white bg-transparent"
-                  >
-                    View Details
-                  </Button>
-                  {gig.status === "active" && (
+                <div className="flex items-center justify-between pt-4 border-t border-gray-700">
+                  <div className="flex space-x-2">
                     <Button
+                      variant="outline"
                       size="sm"
-                      className="bg-purple-600 hover:bg-purple-700 text-white"
+                      className="border-gray-600 text-gray-300 hover:bg-gray-700 hover:text-white bg-transparent"
                     >
-                      Update Progress
+                      View Details
                     </Button>
+                    {gig.status === GigStatus.ACTIVE && (
+                      <Button
+                        size="sm"
+                        className="bg-purple-600 hover:bg-purple-700 text-white"
+                      >
+                        Update Progress
+                      </Button>
+                    )}
+                  </div>
+                  {gig.status === GigStatus.COMPLETED && (
+                    <Badge className="bg-green-600/20 text-green-300 border-green-600/30">
+                      ✓ Completed
+                    </Badge>
+                  )}
+                  {gig.status === GigStatus.PENDING && (
+                    <Badge className="bg-yellow-600/20 text-yellow-300 border-yellow-600/30">
+                      Pending
+                    </Badge>
+                  )}
+                  {gig.status === GigStatus.TALENT_RECOMMENDED && (
+                    <Badge className="bg-purple-600/20 text-purple-300 border-purple-600/30">
+                      Talents Recommended
+                    </Badge>
                   )}
                 </div>
-                {gig.status === "completed" && (
-                  <Badge className="bg-green-600/20 text-green-300 border-green-600/30">
-                    ✓ Payment Received
-                  </Badge>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-        ))}
+              </CardContent>
+            </Card>
+          ))
+        )}
       </div>
 
       <Dialog open={isOpen} onOpenChange={setIsOpen}>

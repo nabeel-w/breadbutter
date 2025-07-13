@@ -36,9 +36,9 @@ model Gig {
   updatedAt        DateTime  @updatedAt
 
   // Foreign Keys
-  customerId         String
-  customer           Customer @relation(fields: [customerId], references: [id])
-  RecommendedTalents Talent[] @relation("GigRecommendedTalents")
+  customerId      String
+  customer        Customer         @relation(fields: [customerId], references: [id])
+  Recommendations Recommendation[]
 }
 
 model Talent {
@@ -53,8 +53,9 @@ model Talent {
   portfolioLinks  String[] // array of URLs
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
-  
-  Gig             Gig[] @relation("GigRecommendedTalents")
+
+  // Gig             Gig[] @relation("GigRecommendedTalents")
+  recommendations Recommendation[]
 }
 
 model Embedding {
@@ -64,6 +65,19 @@ model Embedding {
   vector   Unsupported("vector")
 
   @@index([type, entityId])
+}
+
+model Recommendation {
+  id        String   @id @default(uuid())
+  gigId     String
+  talentId  String
+  createdAt DateTime @default(now())
+  details   String? // Optional details about the recommendation
+  ranking   Int
+
+  // Foreign Keys
+  gig    Gig    @relation(fields: [gigId], references: [id])
+  talent Talent @relation(fields: [talentId], references: [id])
 }
 
 enum EmbeddingType {

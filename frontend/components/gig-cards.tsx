@@ -10,12 +10,12 @@ interface GigCardProps {
   title: string
   description: string
   budget: string
-  timeframe: string
+  // timeframe: string
   skills: string[]
   rating?: number
-  clientName: string
+  // clientName: string
   postedTime: string
-  proposals?: number
+  recommendations: number
 }
 
 export function GigCard({
@@ -23,19 +23,21 @@ export function GigCard({
   title,
   description,
   budget,
-  timeframe,
+  // timeframe,
   skills,
-  rating,
-  clientName,
+  rating = 5,
+  // clientName,
   postedTime,
-  proposals = 0,
+  recommendations = 0,
 }: GigCardProps) {
   return (
     <Card className="bg-gray-800/50 border-gray-700 hover:border-purple-600/50 transition-all duration-300 hover:shadow-lg hover:shadow-purple-600/10">
       <CardContent className="p-6">
         <div className="flex justify-between items-start mb-4">
           <h3 className="text-xl font-semibold text-white mb-2 line-clamp-2">{title}</h3>
-          <Badge className="bg-purple-600/20 text-purple-300 border-purple-600/30 ml-4">{proposals} proposals</Badge>
+          {recommendations ? <Badge className="bg-purple-600/20 text-purple-300 border-purple-600/30 ml-4">{recommendations} recommendations</Badge> :
+            <Badge className="bg-yellow-600/20 text-yellow-300 border-yellow-600/30 ml-4">Pending recommendations</Badge>
+          }
         </div>
 
         <p className="text-gray-300 mb-4 line-clamp-3">{description}</p>
@@ -60,7 +62,7 @@ export function GigCard({
           </div>
           <div className="flex items-center text-gray-400">
             <Clock className="h-4 w-4 mr-1" />
-            <span>{timeframe}</span>
+            <span>{`15 days`}</span>
           </div>
         </div>
 
@@ -70,7 +72,7 @@ export function GigCard({
               <User className="h-4 w-4 text-white" />
             </div>
             <div>
-              <p className="text-sm font-medium text-white">{clientName}</p>
+              {/* <p className="text-sm font-medium text-white">{clientName}</p> */}
               <div className="flex items-center space-x-1">
                 {rating && (
                   <>
