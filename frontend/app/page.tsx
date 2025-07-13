@@ -62,7 +62,10 @@ export default function LandingPage() {
             >
               <Link href="/sign-in">Sign In</Link>
             </Button>
-            <Button className="bg-purple-600 hover:bg-purple-700 text-white" asChild>
+            <Button
+              className="bg-purple-600 hover:bg-purple-700 text-white"
+              asChild
+            >
               <Link href="/sign-up">Get Started</Link>
             </Button>
           </div>
@@ -98,8 +101,12 @@ export default function LandingPage() {
                 className="bg-purple-600 hover:bg-purple-700 text-white px-8 py-4 text-lg"
                 asChild
               >
-                <Link href="/home">Find Talent</Link>
-                <ArrowRight className="ml-2 h-5 w-5" />
+                <Link href="/home">
+                  <span className="flex items-center">
+                    Find Talent
+                    <ArrowRight className="ml-2 h-5 w-5" />
+                  </span>
+                </Link>
               </Button>
               <Button
                 size="lg"
@@ -107,8 +114,12 @@ export default function LandingPage() {
                 className="border-purple-600 text-purple-400 hover:bg-purple-600 hover:text-white px-8 py-4 text-lg bg-transparent"
                 asChild
               >
-                <Link href="/home">Find Gigs</Link>
-                <Briefcase className="ml-2 h-5 w-5" />
+                <Link href="/home">
+                  <span className="flex items-center">
+                    Find Gigs
+                    <Briefcase className="ml-2 h-5 w-5" />
+                  </span>
+                </Link>
               </Button>
             </div>
 

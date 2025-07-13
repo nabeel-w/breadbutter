@@ -23,8 +23,8 @@ export async function onboardUser(
                 email: user.emailAddresses[0]?.emailAddress || "",
                 name: user.firstName && user.lastName ? `${user.firstName} ${user.lastName}` : user.username || "",
                 type,
-                companyName: companyName || null,
-                website: website || null,
+                companyName: companyName ?? null,
+                website: website ?? null,
             }
         });
 
@@ -33,8 +33,8 @@ export async function onboardUser(
             publicMetadata: {
                 onboardingComplete: true,
                 customerType: type,
-                companyName: companyName || null,
-                website: website || null,
+                companyName: companyName ?? undefined,
+                website: website ?? undefined,
                 customerId: customer.id,
             }
         })
